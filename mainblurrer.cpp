@@ -18,11 +18,12 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 
     QPushButton* pb1 = new QPushButton("Set Folder");
     QPushButton* pb2 = new QPushButton("Start Blurring");
-
+    //Populate the combobox
     QComboBox* cb1 = new QComboBox();
-    cb1->addItem("1");
-    cb1->addItem("3");
-    cb1->addItem("6");
+    for(int i = 1; i<11;i++){
+        cb1->addItem(QString::fromStdString(std::to_string(i)));
+    }
+    cb1->setCurrentIndex(5);//Sets default
 
     QIcon *myicon = new QIcon("my_icon.ico");
 
@@ -60,9 +61,11 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     bottom_Hlayout2->addWidget(cb1);
     bottom_Hlayout2->addWidget(pb2);
 
+    m_tabwidget = new QTabWidget;
+    this->initTabWidget();
+
     QHBoxLayout* bottom_Hlayout3 = new QHBoxLayout;
-
-
+    bottom_Hlayout3->addWidget(m_tabwidget);
 
 
     QFrame * mFrame = new QFrame(this);//Must pass this to maintain parent
@@ -88,3 +91,45 @@ MainBlurrer::~MainBlurrer()
 {
 
 }
+
+void MainBlurrer::initTabWidget()
+{
+    /* Pre: Tabwidget is empty
+     * TODO:
+     * 1) Create the Default tab Widget
+     * 2) Prepare the vector for the to be read files.
+     * 3) Choose a Layout
+     * Post: Tabwidget has the default tab, which is empty.
+     */
+    //1 Tab consists of 1 HOR layout.
+    //HOR Layout consists of 2 Vlayouts.
+    //Vlayout consists of LABEL and Frame
+    QHBoxLayout* main_layout = new QHBoxLayout;
+    QVBoxLayout* sub_layout1 = new QVBoxLayout;
+    QVBoxLayout* sub_layout2 = new QVBoxLayout;
+
+    //TODO: Cleanup code duplication
+    QLabel* label1 = new QLabel(tr("Original"));
+    QFrame * mFrame = new QFrame();
+    mFrame->setFrameStyle(1);
+    mFrame->setMinimumHeight(200);
+    mFrame->setMaximumWidth(200);
+    sub_layout1->addWidget(label1);
+    sub_layout1->addWidget(mFrame);
+
+
+    QLabel* label2 = new QLabel(tr("Blurred"));
+    QFrame * mFrame2 = new QFrame();
+    mFrame2->setFrameStyle(1);
+    mFrame2->setMinimumHeight(200);
+    mFrame2->setMaximumWidth(200);
+    sub_layout2->addWidget(label2);
+    sub_layout2->addWidget(mFrame2);
+
+    main_layout->addLayout(sub_layout1);
+    main_layout->addLayout(sub_layout2);
+    QDialog * q = new QDialog;
+    q->setLayout(main_layout);
+    m_tabwidget->addTab(q,"No Results");
+}
+

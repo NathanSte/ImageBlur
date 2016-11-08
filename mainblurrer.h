@@ -16,6 +16,9 @@ public:
     explicit MainBlurrer(QWidget *parent = 0);
     ~MainBlurrer();
 private:
+    void initTabWidget();
+    std::vector<QWidget*> m_tabs;
+    QTabWidget * m_tabwidget;
     QString m_title;
 };
 
