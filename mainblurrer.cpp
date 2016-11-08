@@ -6,6 +6,8 @@
 MainBlurrer::MainBlurrer(QWidget *parent) :
     QDialog(parent)
 {
+    m_blur_disable = true;
+    m_step_dropdown_disable = true;
     QLabel* label1 = new QLabel(tr("Image Folder"));
     QLabel* label2 = new QLabel(tr("Number of Passes"));
     QLabel* label3 = new QLabel(tr("No Results"));
@@ -18,13 +20,18 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 
     QPushButton* pb1 = new QPushButton("Set Folder");
     QPushButton* pb2 = new QPushButton("Start Blurring");
+    if(m_blur_disable){
+        pb2->setDisabled(true);
+    }
     //Populate the combobox
     QComboBox* cb1 = new QComboBox();
     for(int i = 1; i<11;i++){
         cb1->addItem(QString::fromStdString(std::to_string(i)));
     }
     cb1->setCurrentIndex(5);//Sets default
-
+    if(m_step_dropdown_disable){
+        cb1->setDisabled(true);
+    }
     QIcon *myicon = new QIcon("my_icon.ico");
 
     QLabel* pHeader2 = new QLabel(tr("Input a folder of images and let the blurring begin."));
@@ -60,12 +67,20 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     bottom_Hlayout2->addWidget(label2);
     bottom_Hlayout2->addWidget(cb1);
     bottom_Hlayout2->addWidget(pb2);
+    bottom_Hlayout2->addStretch();
 
     m_tabwidget = new QTabWidget;
     this->initTabWidget();
 
     QHBoxLayout* bottom_Hlayout3 = new QHBoxLayout;
     bottom_Hlayout3->addWidget(m_tabwidget);
+
+    QHBoxLayout* bottom_Hlayout4 = new QHBoxLayout;
+    QPushButton* pb3 = new QPushButton("Exit");
+    QObject::connect(pb3,SIGNAL(clicked()),this,SLOT(close()));
+    QLabel* timeLabel = new QLabel(tr("Total Time: -"));
+    bottom_Hlayout4->addWidget(timeLabel,0,Qt::AlignLeft);
+    bottom_Hlayout4->addWidget(pb3,0,Qt::AlignRight);
 
 
     QFrame * mFrame = new QFrame(this);//Must pass this to maintain parent
@@ -75,6 +90,7 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     bottom_layout->addLayout(bottom_Hlayout1);
     bottom_layout->addLayout(bottom_Hlayout2);
     bottom_layout->addLayout(bottom_Hlayout3);
+    bottom_layout->addLayout(bottom_Hlayout4);
 
 
 

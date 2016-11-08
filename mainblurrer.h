@@ -20,6 +20,8 @@ private:
     std::vector<QWidget*> m_tabs;
     QTabWidget * m_tabwidget;
     QString m_title;
+    bool m_blur_disable;
+    bool m_step_dropdown_disable;
 };
 
 #endif // MAINBLURRER_H
