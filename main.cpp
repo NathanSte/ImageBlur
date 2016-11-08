@@ -1,0 +1,11 @@
+#include "mainblurrer.h"
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainBlurrer w;
+    w.show();
+
+    return a.exec();
+}
