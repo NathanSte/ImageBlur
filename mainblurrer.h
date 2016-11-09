@@ -10,6 +10,8 @@
  */
 #include <QDialog>
 #include <QtWidgets>
+#include <QObject>
+#include "imagetabgenerator.h"
 
 class QLabel;
 class QLineEdit;
@@ -25,7 +27,7 @@ public:
 private slots:
     void showFolderSelectDialog();
 private:
-    QDialog* generateSingleTabFromPath(QString path);
+//    QDialog* generateSingleTabFromPath(QString path);
     void generateImagesFromDir(QString dir);
     void initTabWidget();
     std::vector<QWidget*> m_tabs;

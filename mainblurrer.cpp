@@ -10,7 +10,9 @@
 
 #include <QDebug>
 #include <QDir>
-
+namespace {
+    const int INIT_DROPDOWN_BOX_COUNT = 11;//Where should this be declared?
+}
 
 MainBlurrer::MainBlurrer(QWidget *parent) :
     QDialog(parent)
@@ -32,13 +34,13 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     QPixmap* qPM = new QPixmap(":/Image1");
 
     //Populate the combobox
-    this->m_drop_down_menu_passes = new QComboBox();
-    const int INIT_DROPDOWN_BOX_COUNT = 11;//Where should this be declared?
-    for(int i = 1; i<INIT_DROPDOWN_BOX_COUNT;i++)
+    m_drop_down_menu_passes = new QComboBox();
+
+    for(int i = 1; i<::INIT_DROPDOWN_BOX_COUNT;i++)
     {
-        this->m_drop_down_menu_passes->addItem(QString::fromStdString(std::to_string(i)));
+        m_drop_down_menu_passes->addItem(QString::fromStdString(std::to_string(i)));
     }
-    this->m_drop_down_menu_passes->setCurrentIndex(5);//Sets default
+    m_drop_down_menu_passes->setCurrentIndex(5);//Sets default
 
     QLabel* imageLabel = new QLabel();
     imageLabel->setPixmap(qPM->scaled(32,32,Qt::KeepAspectRatio));
@@ -61,17 +63,17 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 
     QHBoxLayout* bottom_Hlayout1 = new QHBoxLayout;
     bottom_Hlayout1->addWidget(img_folder_label,0,Qt::AlignLeft);
-    bottom_Hlayout1->addWidget(this->m_set_folder_line,0);
+    bottom_Hlayout1->addWidget(m_set_folder_line,0);
     bottom_Hlayout1->addWidget(set_folder_push_button);
 
     QHBoxLayout* bottom_Hlayout2 = new QHBoxLayout;
     bottom_Hlayout2->addWidget(num_pass_label);
-    bottom_Hlayout2->addWidget(this->m_drop_down_menu_passes);
-    bottom_Hlayout2->addWidget(this->m_start_blurring_push_button);
+    bottom_Hlayout2->addWidget(m_drop_down_menu_passes);
+    bottom_Hlayout2->addWidget(m_start_blurring_push_button);
     bottom_Hlayout2->addStretch();
 
     m_tabwidget = new QTabWidget;
-    this->initTabWidget();
+    initTabWidget();
 
     QHBoxLayout* bottom_Hlayout3 = new QHBoxLayout;
     bottom_Hlayout3->addWidget(m_tabwidget);
@@ -124,47 +126,46 @@ void MainBlurrer::showFolderSelectDialog()
     else{
        dir = m_set_folder_line->text();
     }
-    this->m_set_folder_line->setText(dir);
-    this->generateImagesFromDir(dir);
+    m_set_folder_line->setText(dir);
+    generateImagesFromDir(dir);
 }
 //--------------------------------------------------------------------------------------------------
-QDialog *MainBlurrer::generateSingleTabFromPath(QString path)
-{
-    /* In: Path of the image
-     * Returns: Dialog widget containing original image and empty blurred image
-    */
-    QDialog * image_tab = new QDialog;
+//QDialog *MainBlurrer::generateSingleTabFromPath(QString path)
+//{
+//    /* In: Path of the image
+//     * Returns: Dialog widget containing original image and empty blurred image
+//    */
+//    QDialog * image_tab = new QDialog;
 
-    QHBoxLayout* main_layout = new QHBoxLayout;
-    QVBoxLayout* sub_layout1 = new QVBoxLayout;
-    QVBoxLayout* sub_layout2 = new QVBoxLayout;
+//    QHBoxLayout* main_layout = new QHBoxLayout;
+//    QVBoxLayout* sub_layout1 = new QVBoxLayout;
+//    QVBoxLayout* sub_layout2 = new QVBoxLayout;
 
-    QImage * qimage = new QImage(path);
-    QPixmap * image = new QPixmap(path);
+//    QPixmap * image = new QPixmap(path);
 
-    QLabel* image_scene = new QLabel;
-    image_scene->setPixmap(image->scaled(200,200));
+//    QLabel* image_scene = new QLabel;
+//    image_scene->setPixmap(image->scaled(200,200));
 
-    QLabel* original_label = new QLabel(tr("Original"));
+//    QLabel* original_label = new QLabel(tr("Original"));
 
-    sub_layout1->addWidget(original_label);
-    sub_layout1->addWidget(image_scene);
+//    sub_layout1->addWidget(original_label);
+//    sub_layout1->addWidget(image_scene);
 
-    QLabel* blurred_label = new QLabel(tr("Blurred"));
-    QFrame * blurred_frame = new QFrame();
-    blurred_frame->setFrameStyle(1);
-    blurred_frame->setMinimumHeight(200);
-    blurred_frame->setMaximumWidth(200);
-    sub_layout2->addWidget(blurred_label);
-    sub_layout2->addWidget(blurred_frame);
+//    QLabel* blurred_label = new QLabel(tr("Blurred"));
+//    QFrame * blurred_frame = new QFrame();
+//    blurred_frame->setFrameStyle(1);
+//    blurred_frame->setMinimumHeight(200);
+//    blurred_frame->setMaximumWidth(200);
+//    sub_layout2->addWidget(blurred_label);
+//    sub_layout2->addWidget(blurred_frame);
 
-    main_layout->addLayout(sub_layout1);
-    main_layout->addLayout(sub_layout2);
-    image_tab->setLayout(main_layout);
-    return image_tab;
+//    main_layout->addLayout(sub_layout1);
+//    main_layout->addLayout(sub_layout2);
+//    image_tab->setLayout(main_layout);
+//    return image_tab;
 
 
-}
+//}
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::generateImagesFromDir(QString dir)
 {
@@ -173,23 +174,24 @@ void MainBlurrer::generateImagesFromDir(QString dir)
     int validfiles = 0;
     while (it.hasNext()){
         it.next();
+        QFileInfo finfo = it.fileInfo();
         QString fname = it.fileName();
         QString fpath = it.filePath();
         if(fname != "." && fname != ".."){
-            QString ext = fname.section(".",1,1);
-            QString raw_name = fname.section(".",0,0);
+            QString ext = finfo.suffix();
+            QString raw_name = finfo.baseName();
             if(ext == "jpg" || ext == "png" ||ext == "tif" ||ext == "bmp"){//find a cleaner way of doing this
                 validfiles++;
-                m_tabwidget->addTab(this->generateSingleTabFromPath(fpath), raw_name);
+                m_tabwidget->addTab(imagehelpspace::ImageTabGenerator::generateSingleTabFromPath(fpath), raw_name);
             }
         }
     }
     if (validfiles == 0) {
-        this->initTabWidget();
+        initTabWidget();
     }
     else{
-        this->m_drop_down_menu_passes->setDisabled(false);
-        this->m_start_blurring_push_button->setDisabled(false);
+        m_drop_down_menu_passes->setDisabled(false);
+        m_start_blurring_push_button->setDisabled(false);
     }
 
 
@@ -234,8 +236,8 @@ void MainBlurrer::initTabWidget()
     QDialog * main_dialog = new QDialog;
     main_dialog->setLayout(main_layout);
     m_tabwidget->addTab(main_dialog,"No Results");
-    this->m_start_blurring_push_button->setDisabled(true);
-    this->m_drop_down_menu_passes->setDisabled(true);
+    m_start_blurring_push_button->setDisabled(true);
+    m_drop_down_menu_passes->setDisabled(true);
 }
 
 //--------------------------------------------------------------------------------------------------

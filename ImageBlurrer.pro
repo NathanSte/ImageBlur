@@ -14,11 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainblurrer.cpp \
-    imagingthread.cpp
+    imagingthread.cpp \
+    imagetabgenerator.cpp
 
 HEADERS  += mainblurrer.h \
     helper.h \
-    imagingthread.h
+    imagingthread.h \
+    imagetabgenerator.h
 
 RC_ICONS = my_icon.ico
 

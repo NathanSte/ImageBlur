@@ -1,6 +1,7 @@
 #ifndef IMAGINGTHREAD_H
 #define IMAGINGTHREAD_H
 
+#include <QThread>
 
 class ImagingThread : public QThread
 {
