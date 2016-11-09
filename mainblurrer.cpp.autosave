@@ -140,6 +140,7 @@ QDialog *MainBlurrer::generateSingleTabFromPath(QString path)
     QVBoxLayout* sub_layout2 = new QVBoxLayout;
 
     QImage * qimage = new QImage(path);
+    
     QPixmap * image = new QPixmap(path);
 
     QLabel* image_scene = new QLabel;

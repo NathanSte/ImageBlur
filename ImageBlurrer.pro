@@ -13,9 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainblurrer.cpp
+        mainblurrer.cpp \
+    imagingthread.cpp
 
-HEADERS  += mainblurrer.h
+HEADERS  += mainblurrer.h \
+    helper.h \
+    imagingthread.h
 
 RC_ICONS = my_icon.ico
 
