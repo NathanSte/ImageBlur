@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="Image1">Image1.png</file>
+        <file alias="program_icon">my_icon.ico</file>
+    </qresource>
+</RCC>

@@ -18,3 +18,6 @@ SOURCES += main.cpp\
 HEADERS  += mainblurrer.h
 
 RC_ICONS = my_icon.ico
+
+RESOURCES += \
+    res.qrc
