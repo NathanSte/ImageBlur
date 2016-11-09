@@ -1,4 +1,5 @@
 #include "imagetabgenerator.h"
+
 namespace imagehelpspace
 {
 ImageTabGenerator::ImageTabGenerator()
@@ -19,7 +20,7 @@ QDialog *ImageTabGenerator::generateSingleTabFromPath(QString path)
 
     QPixmap * image = new QPixmap(path);
 
-    QLabel* image_scene = new QLabel;
+    QLabel* image_scene = new QLabel("image");
     image_scene->setPixmap(image->scaled(200,200));
 
     QLabel* original_label = new QLabel(QObject::tr("Original"));

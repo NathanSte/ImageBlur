@@ -10,6 +10,7 @@
 
 #include <QDebug>
 #include <QDir>
+
 namespace {
     const int INIT_DROPDOWN_BOX_COUNT = 11;//Where should this be declared?
 }
@@ -84,6 +85,8 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 
     QObject::connect(push_button_exit,&QPushButton::clicked,this,&QPushButton::close);//Passing THIS as the receiver?
     QObject::connect(set_folder_push_button,&QPushButton::clicked,this,&MainBlurrer::showFolderSelectDialog);
+    QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::convertTabsToGreyscale);
+
 
     QLabel* time_label = new QLabel(tr("Total Time: -"));
     bottom_Hlayout4->addWidget(time_label,0,Qt::AlignLeft);
@@ -129,43 +132,25 @@ void MainBlurrer::showFolderSelectDialog()
     m_set_folder_line->setText(dir);
     generateImagesFromDir(dir);
 }
+
+void MainBlurrer::convertTabsToGreyscale()
+{
+    qDebug() << "Converting Images to Greyscale";
+    qDebug() << m_tabwidget->count();
+    for(int i = 0; i < m_tabwidget->count();++i)
+    {
+        QDialog* singletab = dynamic_cast<QDialog*>(m_tabwidget->widget(i));
+        qDebug() << (singletab == 0);//is not null
+        QLabel* imagelabel = singletab->findChild<QLabel*>("image");
+        qDebug() << "Starting the scaling";
+        qDebug() << (imagelabel == 0);
+        auto pixmap = imagelabel->pixmap();
+        QImage image = pixmap->toImage();
+        convertGrayscale(&image);
+        imagelabel->setPixmap(QPixmap::fromImage(image));
+    }
+}
 //--------------------------------------------------------------------------------------------------
-//QDialog *MainBlurrer::generateSingleTabFromPath(QString path)
-//{
-//    /* In: Path of the image
-//     * Returns: Dialog widget containing original image and empty blurred image
-//    */
-//    QDialog * image_tab = new QDialog;
-
-//    QHBoxLayout* main_layout = new QHBoxLayout;
-//    QVBoxLayout* sub_layout1 = new QVBoxLayout;
-//    QVBoxLayout* sub_layout2 = new QVBoxLayout;
-
-//    QPixmap * image = new QPixmap(path);
-
-//    QLabel* image_scene = new QLabel;
-//    image_scene->setPixmap(image->scaled(200,200));
-
-//    QLabel* original_label = new QLabel(tr("Original"));
-
-//    sub_layout1->addWidget(original_label);
-//    sub_layout1->addWidget(image_scene);
-
-//    QLabel* blurred_label = new QLabel(tr("Blurred"));
-//    QFrame * blurred_frame = new QFrame();
-//    blurred_frame->setFrameStyle(1);
-//    blurred_frame->setMinimumHeight(200);
-//    blurred_frame->setMaximumWidth(200);
-//    sub_layout2->addWidget(blurred_label);
-//    sub_layout2->addWidget(blurred_frame);
-
-//    main_layout->addLayout(sub_layout1);
-//    main_layout->addLayout(sub_layout2);
-//    image_tab->setLayout(main_layout);
-//    return image_tab;
-
-
-//}
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::generateImagesFromDir(QString dir)
 {
@@ -193,8 +178,6 @@ void MainBlurrer::generateImagesFromDir(QString dir)
         m_drop_down_menu_passes->setDisabled(false);
         m_start_blurring_push_button->setDisabled(false);
     }
-
-
 }
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::initTabWidget()

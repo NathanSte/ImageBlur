@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainblurrer.cpp \
     imagingthread.cpp \
-    imagetabgenerator.cpp
+    imagetabgenerator.cpp \
+    helper.cpp
 
 HEADERS  += mainblurrer.h \
     helper.h \

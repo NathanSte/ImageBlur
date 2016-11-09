@@ -2,7 +2,7 @@
 #define IMAGETABGENERATOR_H
 
 #include <QtWidgets>
-#include <QObject>
+
 namespace imagehelpspace
 {
 
