@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainblurrer.cpp \
     imagingthread.cpp \
     imagetabgenerator.cpp \
-    helper.cpp
+    helper.cpp \
+    mycustomtabwidget.cpp
 
 HEADERS  += mainblurrer.h \
     helper.h \
     imagingthread.h \
-    imagetabgenerator.h
+    imagetabgenerator.h \
+    mycustomtabwidget.h
 
 RC_ICONS = my_icon.ico
 

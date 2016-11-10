@@ -140,12 +140,27 @@ void MainBlurrer::convertTabsToGreyscale()
     for(int i = 0; i < m_tabwidget->count();++i)
     {
         QDialog* singletab = dynamic_cast<QDialog*>(m_tabwidget->widget(i));
-        qDebug() << (singletab == 0);//is not null
-        QLabel* imagelabel = singletab->findChild<QLabel*>("image");
+        QLayout* tablayout = singletab->layout();
+        QLayout * box1 = tablayout->layout();
+        qDebug() << "Box is null:" << (box1 == 0);
+        qDebug() << "Layout1 has this many children:" << box1->count();
+        QLabel * imagelabel = box1->findChild<QLabel*>("image");
+        //QPixmap * pixelmap = imagelabel->pixmap();
+        //QLabel* imagelabel = singletab->findChild<QLabel*>("image",Qt::FindChildrenRecursively);//this reutrns 0, no child with name image
         qDebug() << "Starting the scaling";
-        qDebug() << (imagelabel == 0);
-        auto pixmap = imagelabel->pixmap();
-        QImage image = pixmap->toImage();
+        qDebug() << "Image is null:" << (imagelabel == 0);
+        const QPixmap* pixmap = imagelabel->pixmap();
+        //qDebug() << pixmap->isNull();
+        QImage image;
+        if ( pixmap )
+        {
+            image = pixmap->toImage();
+        }
+        else
+        {
+            qDebug() << "pixmap is null";
+        }
+        qDebug() << image.isNull();
         convertGrayscale(&image);
         imagelabel->setPixmap(QPixmap::fromImage(image));
     }
@@ -182,42 +197,7 @@ void MainBlurrer::generateImagesFromDir(QString dir)
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::initTabWidget()
 {
-    /* Pre: Tabwidget is empty
-     * TODO:
-     * 1) Create the Default tab Widget
-     * 2) Prepare the vector for the to be read files.
-     * 3) Choose a Layout
-     * Post: Tabwidget has the default tab, which is empty.
-     */
-    //1 Tab consists of 1 HOR layout.
-    //HOR Layout consists of 2 Vlayouts.
-    //Vlayout consists of LABEL and Frame
-    QHBoxLayout* main_layout = new QHBoxLayout;
-    QVBoxLayout* sub_layout1 = new QVBoxLayout;
-    QVBoxLayout* sub_layout2 = new QVBoxLayout;
-
-    //TODO: Cleanup code duplication
-    QLabel* original_label = new QLabel(tr("Original"));
-    QFrame * original_frame = new QFrame();
-    original_frame->setFrameStyle(1);
-    original_frame->setMinimumHeight(200);
-    original_frame->setMaximumWidth(200);
-    sub_layout1->addWidget(original_label);
-    sub_layout1->addWidget(original_frame);
-
-
-    QLabel* blurred_label = new QLabel(tr("Blurred"));
-    QFrame * blurred_frame = new QFrame();
-    blurred_frame->setFrameStyle(1);
-    blurred_frame->setMinimumHeight(200);
-    blurred_frame->setMaximumWidth(200);
-    sub_layout2->addWidget(blurred_label);
-    sub_layout2->addWidget(blurred_frame);
-
-    main_layout->addLayout(sub_layout1);
-    main_layout->addLayout(sub_layout2);
-    QDialog * main_dialog = new QDialog;
-    main_dialog->setLayout(main_layout);
+    MyCustomTabWidget * main_dialog = new MyCustomTabWidget();
     m_tabwidget->addTab(main_dialog,"No Results");
     m_start_blurring_push_button->setDisabled(true);
     m_drop_down_menu_passes->setDisabled(true);

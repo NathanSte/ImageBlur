@@ -2,15 +2,15 @@
 #define IMAGETABGENERATOR_H
 
 #include <QtWidgets>
+#include "mycustomtabwidget.h"
 
 namespace imagehelpspace
 {
-
     class ImageTabGenerator
     {
     public:
         ImageTabGenerator();
-        static QDialog* generateSingleTabFromPath(QString path);
+        static MyCustomTabWidget* generateSingleTabFromPath(QString path);
     };
 }
 #endif // IMAGETABGENERATOR_H
