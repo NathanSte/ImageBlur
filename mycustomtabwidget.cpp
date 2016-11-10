@@ -6,6 +6,10 @@ MyCustomTabWidget::MyCustomTabWidget(QWidget *parent) : QDialog(parent)
     m_blurred_image = new QImage();
     m_greyed_image = new QImage();
 
+    m_progress = new QProgressDialog("Blurring Images", "Abort Blur",0,10,this);
+    m_progress_counter = 0;
+    m_progress->cancel();
+
     m_main_layout = new QHBoxLayout;
     m_original_layout = new QVBoxLayout;
     m_blurred_layout = new QVBoxLayout;
@@ -56,12 +60,11 @@ void MyCustomTabWidget::setImage(QString path)
 
 }
 //--------------------------------------------------------------------------------------------------
-void MyCustomTabWidget::blurMyImage(int numberofpasses, QProgressDialog * progress)
+void MyCustomTabWidget::blurMyImage(int numberofpasses)
 {
     QImage temp = *m_greyed_image;
     for(int i=0;i<numberofpasses;i++)
     {
-        progress->setValue(i);
         blurImage(m_greyed_image);
     }
     *m_blurred_image = *m_greyed_image;
@@ -91,4 +94,22 @@ QImage *MyCustomTabWidget::greyed_image() const
 void MyCustomTabWidget::setGreyed_image(QImage *greyed_image)
 {
     m_greyed_image = greyed_image;
+}
+
+void MyCustomTabWidget::updateProgress()
+{
+    m_progress->setHidden(false);
+    this->m_progress_counter++;
+    this->m_progress->setValue(m_progress_counter);
+}
+
+void MyCustomTabWidget::onThreadFinish()
+{
+    ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
+    QImage* blurred = img_thread->rendered_image();
+    *m_blurred_image = *blurred;
+    QPixmap pixmap_from_image = QPixmap::fromImage(*m_blurred_image);
+    pixmap_from_image = pixmap_from_image.scaled(250,250);
+    m_blurred_image_label->setPixmap(pixmap_from_image);
+    m_time_spent = img_thread->elapsed();
 }

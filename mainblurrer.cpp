@@ -20,6 +20,7 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 {
     m_blur_disable = true;
     m_step_dropdown_disable = true;
+    m_time_spent = 0;
 
     QIcon *myicon = new QIcon(":/program_icon");
 
@@ -88,8 +89,8 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::convertTabsToGreyscale);
 
 
-    QLabel* time_label = new QLabel(tr("Total Time: -"));
-    bottom_Hlayout4->addWidget(time_label,0,Qt::AlignLeft);
+    m_time_label = new QLabel(tr("Total Time: -"));
+    bottom_Hlayout4->addWidget(m_time_label,0,Qt::AlignLeft);
     bottom_Hlayout4->addWidget(push_button_exit,0,Qt::AlignRight);
 
     QFrame * mFrame = new QFrame(this);//Must pass this to maintain parent
@@ -135,21 +136,38 @@ void MainBlurrer::showFolderSelectDialog()
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::convertTabsToGreyscale()
 {
-    qDebug() << "Converting Images to Greyscale";
-    qDebug() << m_tabwidget->count();
+    //qDebug() << "Converting Images to Greyscale";
+    //qDebug() << m_tabwidget->count();
     for(int i = 0; i < m_tabwidget->count();++i)
     {
-        qDebug() << "Converting Single image to Greyscale";
+        //qDebug() << "Converting Single image to Greyscale";
         MyCustomTabWidget* singletab = dynamic_cast<MyCustomTabWidget*>(m_tabwidget->widget(i));
         singletab->convertGreyscale();
         QString box_value = this->m_drop_down_menu_passes->currentText();
-        qDebug() << "Starting a new Thread for the blurring!";
-        QProgressDialog * progress = new QProgressDialog("Blurring Image", "Abort Blurring", 0, box_value.toInt(), this);
-        ImagingThread* my_thread = new ImagingThread(singletab, box_value.toInt(), progress);
-        connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinished);
+        //qDebug() << "Starting a new Thread for the blurring!";
+        singletab->m_progress->setMaximum(box_value.toInt());
+        ImagingThread* my_thread = new ImagingThread(singletab->greyed_image(), box_value.toInt());
+        connect(my_thread, &QThread::finished, singletab, &MyCustomTabWidget::onThreadFinish);
+        connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinish);
+        connect(my_thread, &ImagingThread::incProgress, singletab ,&MyCustomTabWidget::updateProgress);
         my_thread->start();
     }
 }
+
+void MainBlurrer::onThreadFinish()
+{
+    //qDebug() << "Entered Thread finish for MainBlurrer";
+    ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
+    //qDebug() << m_time_spent;
+    if(m_time_spent < img_thread->elapsed())
+    {
+       // qDebug() << "Updating the time";
+        m_time_spent = img_thread->elapsed();
+        m_time_label->setText("Total Time: " + QString::number(m_time_spent) + " ms.");
+    }
+
+}
+
 
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::generateImagesFromDir(QString dir)
@@ -183,16 +201,13 @@ void MainBlurrer::generateImagesFromDir(QString dir)
 void MainBlurrer::initTabWidget()
 {
     MyCustomTabWidget * main_dialog = new MyCustomTabWidget();
+    delete main_dialog->m_progress;//Our default doesnt need one, do this to prevent it from showing.
     m_tabwidget->addTab(main_dialog,"No Results");
+
     m_start_blurring_push_button->setDisabled(true);
     m_drop_down_menu_passes->setDisabled(true);
 }
 //--------------------------------------------------------------------------------------------------
-void MainBlurrer::onThreadFinished()
-{
-    qDebug() << "Finished SLOT. The thread has finished working.";
-}
-
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@ public:
 private slots:
     void showFolderSelectDialog();
     void convertTabsToGreyscale();
-    void onThreadFinished();
+    void onThreadFinish();
 private:
     void generateImagesFromDir(QString dir);
     void initTabWidget();
@@ -42,6 +42,8 @@ private:
     QLineEdit * m_set_folder_line;
     QPushButton* m_start_blurring_push_button;
     QComboBox* m_drop_down_menu_passes;
+    qint64 m_time_spent;
+    QLabel* m_time_label;
 };
 
 #endif // MAINBLURRER_H
