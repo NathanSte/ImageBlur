@@ -2,6 +2,7 @@
 #define MYCUSTOMTABWIDGET_H
 
 #include <QtWidgets>
+#include "helper.h"
 
 class MyCustomTabWidget : public QDialog
 {
@@ -9,7 +10,11 @@ class MyCustomTabWidget : public QDialog
 public:
     explicit MyCustomTabWidget(QWidget *parent = 0);
     void setImage(QString path);
-    void blurImage();
+    void blurMyImage(int numberofpasses);
+    void convertGreyscale();
+
+    QImage *greyed_image() const;
+    void setGreyed_image(QImage *greyed_image);
 
 signals:
 
@@ -18,6 +23,7 @@ public slots:
 private:
     QImage * m_original_image;
     QImage * m_blurred_image;
+    QImage * m_greyed_image;
     QHBoxLayout * m_main_layout;
     QVBoxLayout * m_original_layout;
     QVBoxLayout * m_blurred_layout;

@@ -132,40 +132,24 @@ void MainBlurrer::showFolderSelectDialog()
     m_set_folder_line->setText(dir);
     generateImagesFromDir(dir);
 }
-
+//--------------------------------------------------------------------------------------------------
 void MainBlurrer::convertTabsToGreyscale()
 {
     qDebug() << "Converting Images to Greyscale";
     qDebug() << m_tabwidget->count();
     for(int i = 0; i < m_tabwidget->count();++i)
     {
-        QDialog* singletab = dynamic_cast<QDialog*>(m_tabwidget->widget(i));
-        QLayout* tablayout = singletab->layout();
-        QLayout * box1 = tablayout->layout();
-        qDebug() << "Box is null:" << (box1 == 0);
-        qDebug() << "Layout1 has this many children:" << box1->count();
-        QLabel * imagelabel = box1->findChild<QLabel*>("image");
-        //QPixmap * pixelmap = imagelabel->pixmap();
-        //QLabel* imagelabel = singletab->findChild<QLabel*>("image",Qt::FindChildrenRecursively);//this reutrns 0, no child with name image
-        qDebug() << "Starting the scaling";
-        qDebug() << "Image is null:" << (imagelabel == 0);
-        const QPixmap* pixmap = imagelabel->pixmap();
-        //qDebug() << pixmap->isNull();
-        QImage image;
-        if ( pixmap )
-        {
-            image = pixmap->toImage();
-        }
-        else
-        {
-            qDebug() << "pixmap is null";
-        }
-        qDebug() << image.isNull();
-        convertGrayscale(&image);
-        imagelabel->setPixmap(QPixmap::fromImage(image));
+        qDebug() << "Converting Single image to Greyscale";
+        MyCustomTabWidget* singletab = dynamic_cast<MyCustomTabWidget*>(m_tabwidget->widget(i));
+        singletab->convertGreyscale();
+        QString box_value = this->m_drop_down_menu_passes->currentText();
+        qDebug() << "Starting a new Thread for the blurring!";
+        ImagingThread* my_thread = new ImagingThread(singletab, box_value.toInt());
+        connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinished);
+        my_thread->start();
     }
 }
-//--------------------------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------------------------
 void MainBlurrer::generateImagesFromDir(QString dir)
 {
@@ -201,6 +185,11 @@ void MainBlurrer::initTabWidget()
     m_tabwidget->addTab(main_dialog,"No Results");
     m_start_blurring_push_button->setDisabled(true);
     m_drop_down_menu_passes->setDisabled(true);
+}
+//--------------------------------------------------------------------------------------------------
+void MainBlurrer::onThreadFinished()
+{
+    qDebug() << "Finished SLOT. The thread has finished working.";
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 #include <QDebug>
 #include <QDir>
 #include "imagetabgenerator.h"
-#include "helper.h"
+#include "imagingthread.h"
 
 class QLabel;
 class QLineEdit;
@@ -30,6 +30,7 @@ public:
 private slots:
     void showFolderSelectDialog();
     void convertTabsToGreyscale();
+    void onThreadFinished();
 private:
     void generateImagesFromDir(QString dir);
     void initTabWidget();
