@@ -11,14 +11,11 @@ class ImagingThread : public QThread
 {
     Q_OBJECT
 public:
-    ImagingThread(MyCustomTabWidget* m, int num);
+    ImagingThread(MyCustomTabWidget* m, int num, QProgressDialog * p);
     virtual void run();
     int m_numberofpasses;
-    QImage * m_image;
-    QImage * m_rendered_image;
-    QImage *rendered_image() const;
+    QProgressDialog * m_progress;
     MyCustomTabWidget* m_tab;
-    void setRendered_image(QImage *rendered_image);
 
 signals:
     void renderedImage(QImage * p);

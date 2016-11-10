@@ -10,7 +10,7 @@ class MyCustomTabWidget : public QDialog
 public:
     explicit MyCustomTabWidget(QWidget *parent = 0);
     void setImage(QString path);
-    void blurMyImage(int numberofpasses);
+    void blurMyImage(int numberofpasses, QProgressDialog *progress);
     void convertGreyscale();
 
     QImage *greyed_image() const;

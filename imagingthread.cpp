@@ -1,22 +1,15 @@
 #include "imagingthread.h"
 
-ImagingThread::ImagingThread(MyCustomTabWidget* m, int num)
+ImagingThread::ImagingThread(MyCustomTabWidget* m, int num, QProgressDialog * p)
 {
+    m_progress = p;
     m_tab = m;
     m_numberofpasses = num;
-}
 
+}
+//--------------------------------------------------------------------------------------------------
 void ImagingThread::run()
 {
-    m_tab->blurMyImage(m_numberofpasses);
+    m_tab->blurMyImage(m_numberofpasses,m_progress);
 }
-
-QImage *ImagingThread::rendered_image() const
-{
-    return m_rendered_image;
-}
-
-void ImagingThread::setRendered_image(QImage *rendered_image)
-{
-    m_rendered_image = rendered_image;
-}
+//--------------------------------------------------------------------------------------------------

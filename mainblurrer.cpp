@@ -12,7 +12,7 @@
 #include <QDir>
 
 namespace {
-    const int INIT_DROPDOWN_BOX_COUNT = 11;//Where should this be declared?
+    const int INIT_DROPDOWN_BOX_COUNT = 11;
 }
 
 MainBlurrer::MainBlurrer(QWidget *parent) :
@@ -144,7 +144,8 @@ void MainBlurrer::convertTabsToGreyscale()
         singletab->convertGreyscale();
         QString box_value = this->m_drop_down_menu_passes->currentText();
         qDebug() << "Starting a new Thread for the blurring!";
-        ImagingThread* my_thread = new ImagingThread(singletab, box_value.toInt());
+        QProgressDialog * progress = new QProgressDialog("Blurring Image", "Abort Blurring", 0, box_value.toInt(), this);
+        ImagingThread* my_thread = new ImagingThread(singletab, box_value.toInt(), progress);
         connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinished);
         my_thread->start();
     }
