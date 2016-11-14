@@ -82,11 +82,11 @@ void MyCustomTabWidget::updateProgress()
 void MyCustomTabWidget::onThreadFinish()
 {
     ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
-    m_blurred_image = new QImage(* img_thread->rendered_image());
+    m_blurred_image = new QImage(* img_thread->getRenderedImage());
     QPixmap pixmap_from_image = QPixmap::fromImage(*m_blurred_image);
     pixmap_from_image = pixmap_from_image.scaled(250,250);
     m_blurred_image_label->setPixmap(pixmap_from_image);
-    m_time_spent = img_thread->elapsed();
+    m_time_spent = img_thread->getElapsed();
 }
 //--------------------------------------------------------------------------------------------------
 QImage *MyCustomTabWidget::getOriginalImage() const

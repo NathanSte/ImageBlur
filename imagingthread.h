@@ -21,9 +21,9 @@ class ImagingThread : public QThread
 public:
     ImagingThread(QImage *img, int num);
     virtual void run();
-    QImage *rendered_image() const;
-    void setRendered_image(QImage *rendered_image);
-    qint64 elapsed() const;
+    QImage *getRenderedImage() const;
+    void setRenderedImage(QImage *getRenderedImage);
+    qint64 getElapsed() const;
 
     QProgressDialog *getProgress() const;
     void setProgress(QProgressDialog *getProgress);
@@ -32,7 +32,6 @@ public:
     void setNumberofpasses(int numberofpasses);
 
 signals:
-    void renderedImage(QImage * p);
     void incProgress();
 
 private:

@@ -29,7 +29,7 @@ MainBlurrer::~MainBlurrer()
 void MainBlurrer::showFolderSelectDialog()
 {
     QString dir;
-    if(m_set_folder_line->text().size() == 0)
+    if(m_set_folder_line->text().isEmpty())
     {
         dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                                                  "/home",
@@ -63,9 +63,9 @@ void MainBlurrer::blurAllTabs()
 void MainBlurrer::onThreadFinish()
 {
     ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
-    if(m_time_spent < img_thread->elapsed())
+    if(m_time_spent < img_thread->getElapsed())
     {
-        m_time_spent = img_thread->elapsed();
+        m_time_spent = img_thread->getElapsed();
         m_time_label->setText("Total Time: " + QString::number(m_time_spent) + " ms.");
     }
 
@@ -92,6 +92,7 @@ void MainBlurrer::initGUI()
 
     m_drop_down_menu_passes = new QComboBox();
 
+    //Populates the dropdown menu
     for(int i = 1; i<::INIT_DROPDOWN_BOX_COUNT;i++)
     {
         m_drop_down_menu_passes->addItem(QString::fromStdString(std::to_string(i)));
@@ -138,11 +139,6 @@ void MainBlurrer::initGUI()
 
     QPushButton* push_button_exit = new QPushButton("Exit");
 
-    QObject::connect(push_button_exit,&QPushButton::clicked,this,&QPushButton::close);
-    QObject::connect(set_folder_push_button,&QPushButton::clicked,this,&MainBlurrer::showFolderSelectDialog);
-    QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::blurAllTabs);
-
-
     m_time_label = new QLabel(tr("Total Time: -"));
     bottom_Hlayout4->addWidget(m_time_label,0,Qt::AlignLeft);
     bottom_Hlayout4->addWidget(push_button_exit,0,Qt::AlignRight);
@@ -158,7 +154,11 @@ void MainBlurrer::initGUI()
 
     main_layout->addLayout(header_layout);
     main_layout->addWidget(mFrame);
-
+    // Signal and Slot connections
+    QObject::connect(push_button_exit,&QPushButton::clicked,this,&QPushButton::close);
+    QObject::connect(set_folder_push_button,&QPushButton::clicked,this,&MainBlurrer::showFolderSelectDialog);
+    QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::blurAllTabs);
+    //Main GUI
     setLayout(main_layout);
     setWindowIcon(*myicon); //Sets the icon, increases Reference count to icon
     setWindowTitle(tr("ImageBlurrer v1.0"));

@@ -18,7 +18,6 @@
 class MainBlurrer : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit MainBlurrer(QWidget *parent = 0);
     ~MainBlurrer();
@@ -28,7 +27,7 @@ private slots:
     void onThreadFinish();
 private:
     void initGUI();
-    void generateImagesFromDir(QString dir);
+    void generateImagesFromDir(const QString dir);
     void initTabWidget();
     QTabWidget * m_tabwidget;
     QString m_title;

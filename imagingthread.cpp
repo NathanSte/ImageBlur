@@ -26,10 +26,11 @@ void ImagingThread::run()
         emit incProgress();
     }
     m_rendered_image = new QImage(*temp);
+    delete temp;
     m_elapsed = m_timer.elapsed();
 }
 //--------------------------------------------------------------------------------------------------
-qint64 ImagingThread::elapsed() const
+qint64 ImagingThread::getElapsed() const
 {
     return m_elapsed;
 }
@@ -54,12 +55,12 @@ void ImagingThread::setNumberofpasses(int numberofpasses)
     m_numberofpasses = numberofpasses;
 }
 //--------------------------------------------------------------------------------------------------
-QImage *ImagingThread::rendered_image() const
+QImage *ImagingThread::getRenderedImage() const
 {
     return m_rendered_image;
 }
 //--------------------------------------------------------------------------------------------------
-void ImagingThread::setRendered_image(QImage *rendered_image)
+void ImagingThread::setRenderedImage(QImage *rendered_image)
 {
     m_rendered_image = rendered_image;
 }
