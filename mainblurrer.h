@@ -1,5 +1,3 @@
-#ifndef MAINBLURRER_H
-#define MAINBLURRER_H
 /*
  * “Copyright (c) <current year> Medicim NV. All rights reserved.
  * Confidential and for internal use only.
@@ -8,6 +6,7 @@
  * Any disclosure, copying, distribution or use of any parts of the content of
  * this document by unauthorized parties is strictly prohibited.”
  */
+#pragma once
 #include <QDialog>
 #include <QtWidgets>
 #include <QObject>
@@ -15,10 +14,6 @@
 #include <QDir>
 #include "imagetabgenerator.h"
 #include "imagingthread.h"
-
-class QLabel;
-class QLineEdit;
-class QTextEdit;
 
 class MainBlurrer : public QDialog
 {
@@ -29,12 +24,12 @@ public:
     ~MainBlurrer();
 private slots:
     void showFolderSelectDialog();
-    void convertTabsToGreyscale();
+    void blurAllTabs();
     void onThreadFinish();
 private:
+    void initGUI();
     void generateImagesFromDir(QString dir);
     void initTabWidget();
-    std::vector<QWidget*> m_tabs;
     QTabWidget * m_tabwidget;
     QString m_title;
     bool m_blur_disable;
@@ -46,4 +41,4 @@ private:
     QLabel* m_time_label;
 };
 
-#endif // MAINBLURRER_H
+

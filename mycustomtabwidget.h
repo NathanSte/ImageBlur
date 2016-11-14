@@ -1,5 +1,12 @@
-#ifndef MYCUSTOMTABWIDGET_H
-#define MYCUSTOMTABWIDGET_H
+/*
+ * “Copyright (c) <current year> Medicim NV. All rights reserved.
+ * Confidential and for internal use only.
+ * The content of this document constitutes proprietary
+ * information of the Nobel Biocare group of companies.
+ * Any disclosure, copying, distribution or use of any parts of the content of
+ * this document by unauthorized parties is strictly prohibited.”
+ */
+#pragma once
 
 #include <QtWidgets>
 #include "helper.h"
@@ -10,23 +17,25 @@ class MyCustomTabWidget : public QDialog
     Q_OBJECT
 public:
     explicit MyCustomTabWidget(QWidget *parent = 0);
-    void setImage(QString path);
-    void blurMyImage(int numberofpasses);
-    void convertGreyscale();
-    QProgressDialog * m_progress;
-    int m_progress_counter;
-    QImage *greyed_image() const;
-    void setGreyed_image(QImage *greyed_image);
+    void initImage(QString path);
+    void initGUI();
 
-signals:
+    int getProgressCounter() const;
+    void setProgressCounter(int getProgressCounter);
+
+    QProgressDialog *getProgress() const;
+    void setProgress(QProgressDialog *getProgress);
+    QImage *getOriginalImage() const;
+    void setoriginalImage(QImage *getOriginalImage);
 
 public slots:
     void updateProgress();
     void onThreadFinish();
 private:
+    QProgressDialog * m_progress;
+    int m_progress_counter;
     QImage * m_original_image;
     QImage * m_blurred_image;
-    QImage * m_greyed_image;
     QHBoxLayout * m_main_layout;
     QVBoxLayout * m_original_layout;
     QVBoxLayout * m_blurred_layout;
@@ -37,5 +46,3 @@ private:
     qint64 m_time_spent;
 
 };
-
-#endif // MYCUSTOMTABWIDGET_H

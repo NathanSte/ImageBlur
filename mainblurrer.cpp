@@ -18,6 +18,61 @@ namespace {
 MainBlurrer::MainBlurrer(QWidget *parent) :
     QDialog(parent)
 {
+    initGUI();
+}
+//--------------------------------------------------------------------------------------------------
+MainBlurrer::~MainBlurrer()
+{
+    //Free all non QT Variables
+}
+//--------------------------------------------------------------------------------------------------
+void MainBlurrer::showFolderSelectDialog()
+{
+    QString dir;
+    if(m_set_folder_line->text().size() == 0)
+    {
+        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 "/home",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+    }
+    else{
+       dir = m_set_folder_line->text();
+    }
+    m_set_folder_line->setText(dir);
+    generateImagesFromDir(dir);
+}
+//--------------------------------------------------------------------------------------------------
+void MainBlurrer::blurAllTabs()
+{
+    for(int i = 0; i < m_tabwidget->count();++i)
+    {
+        MyCustomTabWidget* singletab = dynamic_cast<MyCustomTabWidget*>(m_tabwidget->widget(i));
+        QString box_value = this->m_drop_down_menu_passes->currentText();
+
+        singletab->getProgress()->setMaximum(box_value.toInt());
+        ImagingThread* my_thread = new ImagingThread(singletab->getOriginalImage(), box_value.toInt());
+        connect(my_thread, &QThread::finished, singletab, &MyCustomTabWidget::onThreadFinish);
+        connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinish);
+        connect(my_thread, &QThread::finished, my_thread, &QThread::deleteLater);
+        connect(my_thread, &ImagingThread::incProgress, singletab ,&MyCustomTabWidget::updateProgress);
+        my_thread->start();
+    }
+}
+//--------------------------------------------------------------------------------------------------
+void MainBlurrer::onThreadFinish()
+{
+    ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
+    if(m_time_spent < img_thread->elapsed())
+    {
+        m_time_spent = img_thread->elapsed();
+        m_time_label->setText("Total Time: " + QString::number(m_time_spent) + " ms.");
+    }
+
+}
+//--------------------------------------------------------------------------------------------------
+void MainBlurrer::initGUI()
+{
     m_blur_disable = true;
     m_step_dropdown_disable = true;
     m_time_spent = 0;
@@ -35,7 +90,6 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     QLabel* healder_label1 = new QLabel(tr("Input a folder of images and let the blurring begin."));
     QPixmap* qPM = new QPixmap(":/Image1");
 
-    //Populate the combobox
     m_drop_down_menu_passes = new QComboBox();
 
     for(int i = 1; i<::INIT_DROPDOWN_BOX_COUNT;i++)
@@ -84,9 +138,9 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
 
     QPushButton* push_button_exit = new QPushButton("Exit");
 
-    QObject::connect(push_button_exit,&QPushButton::clicked,this,&QPushButton::close);//Passing THIS as the receiver?
+    QObject::connect(push_button_exit,&QPushButton::clicked,this,&QPushButton::close);
     QObject::connect(set_folder_push_button,&QPushButton::clicked,this,&MainBlurrer::showFolderSelectDialog);
-    QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::convertTabsToGreyscale);
+    QObject::connect(m_start_blurring_push_button,&QPushButton::clicked,this,&MainBlurrer::blurAllTabs);
 
 
     m_time_label = new QLabel(tr("Total Time: -"));
@@ -105,67 +159,9 @@ MainBlurrer::MainBlurrer(QWidget *parent) :
     main_layout->addLayout(header_layout);
     main_layout->addWidget(mFrame);
 
-    this->setLayout(main_layout);
-    this->setWindowIcon(*myicon); //Sets the icon, increases Reference count to icon
-    this->setWindowTitle(tr("ImageBlurrer v1.0"));
-
-}
-//--------------------------------------------------------------------------------------------------
-MainBlurrer::~MainBlurrer()
-{
-    //Free all non QT Variables
-}
-//--------------------------------------------------------------------------------------------------
-void MainBlurrer::showFolderSelectDialog()
-{
-    QString dir;
-    if(m_set_folder_line->text().size() == 0)
-    {
-        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                 "/home",
-                                                 QFileDialog::ShowDirsOnly
-                                                 | QFileDialog::DontResolveSymlinks);
-    //Dir now contains the path...
-    }
-    else{
-       dir = m_set_folder_line->text();
-    }
-    m_set_folder_line->setText(dir);
-    generateImagesFromDir(dir);
-}
-//--------------------------------------------------------------------------------------------------
-void MainBlurrer::convertTabsToGreyscale()
-{
-    //qDebug() << "Converting Images to Greyscale";
-    //qDebug() << m_tabwidget->count();
-    for(int i = 0; i < m_tabwidget->count();++i)
-    {
-        //qDebug() << "Converting Single image to Greyscale";
-        MyCustomTabWidget* singletab = dynamic_cast<MyCustomTabWidget*>(m_tabwidget->widget(i));
-        singletab->convertGreyscale();
-        QString box_value = this->m_drop_down_menu_passes->currentText();
-        //qDebug() << "Starting a new Thread for the blurring!";
-        singletab->m_progress->setMaximum(box_value.toInt());
-        ImagingThread* my_thread = new ImagingThread(singletab->greyed_image(), box_value.toInt());
-        connect(my_thread, &QThread::finished, singletab, &MyCustomTabWidget::onThreadFinish);
-        connect(my_thread, &QThread::finished, this, &MainBlurrer::onThreadFinish);
-        connect(my_thread, &ImagingThread::incProgress, singletab ,&MyCustomTabWidget::updateProgress);
-        my_thread->start();
-    }
-}
-
-void MainBlurrer::onThreadFinish()
-{
-    //qDebug() << "Entered Thread finish for MainBlurrer";
-    ImagingThread * img_thread = dynamic_cast<ImagingThread*>(sender());
-    //qDebug() << m_time_spent;
-    if(m_time_spent < img_thread->elapsed())
-    {
-       // qDebug() << "Updating the time";
-        m_time_spent = img_thread->elapsed();
-        m_time_label->setText("Total Time: " + QString::number(m_time_spent) + " ms.");
-    }
-
+    setLayout(main_layout);
+    setWindowIcon(*myicon); //Sets the icon, increases Reference count to icon
+    setWindowTitle(tr("ImageBlurrer v1.0"));
 }
 
 
@@ -201,13 +197,9 @@ void MainBlurrer::generateImagesFromDir(QString dir)
 void MainBlurrer::initTabWidget()
 {
     MyCustomTabWidget * main_dialog = new MyCustomTabWidget();
-    delete main_dialog->m_progress;//Our default doesnt need one, do this to prevent it from showing.
+    delete main_dialog->getProgress();//Our default doesnt need one, do this to prevent it from showing.
     m_tabwidget->addTab(main_dialog,"No Results");
 
     m_start_blurring_push_button->setDisabled(true);
     m_drop_down_menu_passes->setDisabled(true);
 }
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
